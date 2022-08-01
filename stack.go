@@ -18,6 +18,10 @@ import (
 	"runtime"
 )
 
+var (
+	dpc = make([]uintptr, 0)
+)
+
 func stack(skip int, depth int) []uintptr {
 	if depth < 1 {
 		depth = 1
