@@ -26,7 +26,7 @@ package main
 import (
     "fmt"
 
-    "github.com/enterprise-framework/runpoint"
+    "github.com/goentf/runpoint"
 )
 
 func main() {

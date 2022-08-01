@@ -1,3 +1,3 @@
-module github.com/enterprise-framework/runpoint
+module github.com/goentf/runpoint
 
 go 1.15

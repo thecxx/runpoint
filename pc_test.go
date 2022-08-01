@@ -18,7 +18,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/enterprise-framework/runpoint"
+	"github.com/goentf/runpoint"
 )
 
 func TestFunc(t *testing.T) {
