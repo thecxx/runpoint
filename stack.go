@@ -26,10 +26,10 @@ func stack(skip int, depth int) []uintptr {
 	if depth < 1 {
 		depth = 1
 	}
-	pc := make([]uintptr, depth)
-	nm := runtime.Callers(skip+1, pc)
+	st := make([]uintptr, depth)
+	nm := runtime.Callers(skip+1, st)
 	if nm < 1 {
 		return dpc
 	}
-	return pc[0:nm]
+	return st[0:nm]
 }

@@ -19,7 +19,6 @@ import (
 	"path"
 	"runtime"
 	"sync/atomic"
-	"unsafe"
 )
 
 var (
@@ -36,7 +35,10 @@ func SetTraceStackDepth(new int) (old int) {
 
 type (
 	// Program counter slice
-	PCounter []uintptr
+	PCounter struct {
+		st []uintptr
+		fr runtime.Frame
+	}
 )
 
 // PC returns a PCounter.
@@ -48,65 +50,46 @@ func PC(skip ...int) PCounter {
 		}
 		s = skip[0]
 	}
-	p1 := stack(s+2, int(depth))
-	pn := len(p1)
-	if pn < 1 {
-		return nil
+	p := PCounter{st: stack(s+2, int(depth))}
+	if len(p.st) > 0 {
+		p.fr, _ = runtime.CallersFrames(p.st[0:1]).Next()
 	}
-	pc := make([]uintptr, pn+1)
-	// Copy the PCs to slice[1:]
-	copy(pc[1:], p1)
-	// Get frame of the first PC
-	frame, _ := runtime.CallersFrames(p1[0:1]).Next()
-	pc[0] = (uintptr)(unsafe.Pointer(&frame))
-
-	return pc
+	return p
 }
 
 // Func returns the name of the function.
 func (p PCounter) Func() (name string) {
-	return p.frame().Function
-}
-
-// Func returns the name of the function.
-func Func() string {
-	return PCounter(stack(2, 1)).Func()
+	if p.fr.PC != 0 {
+		name = p.fr.Function
+	}
+	return
 }
 
 // Dir returns the directory name of the
 // source code corresponding to the program counter pc.
 func (p PCounter) Dir() (dir string) {
-	return path.Dir(p.frame().File)
-}
-
-// Dir returns the directory name of the
-// source code corresponding to the program counter pc.
-func Dir() string {
-	return PCounter(stack(2, 1)).Dir()
+	if p.fr.PC != 0 {
+		dir = path.Dir(p.fr.File)
+	}
+	return
 }
 
 // File returns the file name of the
 // source code corresponding to the program counter pc.
 func (p PCounter) File() (file string) {
-	return p.frame().File
-}
-
-// File returns the file name of the
-// source code corresponding to the program counter pc.
-func File() string {
-	return PCounter(stack(2, 1)).File()
+	if p.fr.PC != 0 {
+		file = p.fr.File
+	}
+	return
 }
 
 // Line returns the line number of the
 // source code corresponding to the program counter pc.
 func (p PCounter) Line() (line int) {
-	return p.frame().Line
-}
-
-// Line returns the line number of the
-// source code corresponding to the program counter pc.
-func Line() int {
-	return PCounter(stack(2, int(depth))).Line()
+	if p.fr.PC != 0 {
+		line = p.fr.Line
+	}
+	return
 }
 
 // Frames is used to get all the stack frame.
@@ -114,11 +97,11 @@ func (p PCounter) Frames(fun func(Frame)) (num int) {
 	if fun == nil {
 		return
 	}
-	if len(p) < 1 {
+	if len(p.st) < 1 {
 		return
 	}
 
-	frames := runtime.CallersFrames(p[1:])
+	frames := runtime.CallersFrames(p.st)
 	for {
 		frame, ok := frames.Next()
 		if !ok {
@@ -130,9 +113,30 @@ func (p PCounter) Frames(fun func(Frame)) (num int) {
 	}
 }
 
-func (p PCounter) frame() runtime.Frame {
-	if len(p) < 1 || p[0] == 0 {
-		return runtime.Frame{}
-	}
-	return *(*runtime.Frame)(unsafe.Pointer(p[0]))
+// Func returns the name of the function.
+func Func() string {
+	return frame(2).Function
+}
+
+// Dir returns the directory name of the
+// source code corresponding to the program counter pc.
+func Dir() string {
+	return path.Dir(frame(2).File)
+}
+
+// File returns the file name of the
+// source code corresponding to the program counter pc.
+func File() string {
+	return frame(2).File
+}
+
+// Line returns the line number of the
+// source code corresponding to the program counter pc.
+func Line() int {
+	return frame(2).Line
+}
+
+func frame(skip int) (f runtime.Frame) {
+	f, _ = runtime.CallersFrames(stack(skip+1, 1)).Next()
+	return
 }
