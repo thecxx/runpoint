@@ -33,3 +33,8 @@ func stack(skip int, depth int) []uintptr {
 	}
 	return st[0:nm]
 }
+
+func frame(skip int) (f runtime.Frame) {
+	f, _ = runtime.CallersFrames(stack(skip+1, 1)).Next()
+	return
+}

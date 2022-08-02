@@ -21,8 +21,8 @@ import (
 	"github.com/goentf/runpoint"
 )
 
-func TestFunc(t *testing.T) {
-	if !strings.HasSuffix(runpoint.PC().Func(), "TestFunc") {
+func TestFunction(t *testing.T) {
+	if !strings.HasSuffix(runpoint.PC().Function(), "TestFunction") {
 		t.Errorf("Func fail")
 	}
 }
@@ -36,5 +36,14 @@ func TestDir(t *testing.T) {
 func TestFile(t *testing.T) {
 	if !strings.HasSuffix(runpoint.PC().File(), "pc_test.go") {
 		t.Errorf("File fail")
+	}
+}
+
+func TestAll(t *testing.T) {
+	if runpoint.Package() != "runpoint_test" {
+		t.Errorf("Package fail")
+	}
+	if runpoint.Function() != "TestAll" {
+		t.Errorf("Function fail")
 	}
 }

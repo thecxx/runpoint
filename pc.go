@@ -57,15 +57,55 @@ func PC(skip ...int) PCounter {
 	return p
 }
 
-// Func returns the name of the function.
-func (p PCounter) Func() (name string) {
+// FuncFull returns the full name of the function.
+func (p PCounter) FuncFull() (name string) {
 	if p.fr.PC != 0 {
 		name = p.fr.Function
 	}
 	return
 }
 
-// Dir returns the directory name of the
+// PackFull returns the full package name of the function.
+func (p PCounter) PackFull() (name string) {
+	if p.fr.PC != 0 {
+		name, _, _, _, _ = splitFuncFull(p.fr.Function)
+	}
+	return
+}
+
+// Package returns the package name of the function.
+func (p PCounter) Package() (name string) {
+	if p.fr.PC != 0 {
+		_, name, _, _, _ = splitFuncFull(p.fr.Function)
+	}
+	return
+}
+
+// FuncLong returns the long name of the function.
+func (p PCounter) FuncLong() (name string) {
+	if p.fr.PC != 0 {
+		_, _, name, _, _ = splitFuncFull(p.fr.Function)
+	}
+	return
+}
+
+// Receiver returns the receiver type of the function.
+func (p PCounter) Receiver() (name string) {
+	if p.fr.PC != 0 {
+		_, _, _, name, _ = splitFuncFull(p.fr.Function)
+	}
+	return
+}
+
+// Function returns the name of the function.
+func (p PCounter) Function() (name string) {
+	if p.fr.PC != 0 {
+		_, _, _, _, name = splitFuncFull(p.fr.Function)
+	}
+	return
+}
+
+// Dir returns the directory path of the
 // source code corresponding to the program counter pc.
 func (p PCounter) Dir() (dir string) {
 	if p.fr.PC != 0 {
@@ -74,11 +114,20 @@ func (p PCounter) Dir() (dir string) {
 	return
 }
 
-// File returns the file name of the
+// File returns the file path of the
 // source code corresponding to the program counter pc.
 func (p PCounter) File() (file string) {
 	if p.fr.PC != 0 {
 		file = p.fr.File
+	}
+	return
+}
+
+// Filename returns the file name of the
+// source code corresponding to the program counter pc.
+func (p PCounter) Filename() (dir string) {
+	if p.fr.PC != 0 {
+		dir = path.Base(p.fr.File)
 	}
 	return
 }
@@ -113,30 +162,85 @@ func (p PCounter) Frames(fun func(Frame)) (num int) {
 	}
 }
 
-// Func returns the name of the function.
-func Func() string {
+// FuncFull returns the full name of the function.
+//
+// Example:
+// 		"github.com/goentf/runpoint.FuncFull"
+// 		"github.com/goentf/runpoint.(*PCounter).FuncFull"
+// 		"github.com/goentf/runpoint.(*PCounter).FuncFull.func1"
+func FuncFull() (name string) {
 	return frame(2).Function
 }
 
-// Dir returns the directory name of the
+// PackFull returns the full package name of the function.
+//
+// Example:
+// 		"github.com/goentf/runpoint"
+func PackFull() (name string) {
+	name, _, _, _, _ = splitFuncFull(frame(2).Function)
+	return
+}
+
+// Package returns the package name of the function.
+//
+// Example:
+// 		"runpoint"
+func Package() (name string) {
+	_, name, _, _, _ = splitFuncFull(frame(2).Function)
+	return
+}
+
+// FuncLong returns the long name of the function.
+//
+// Example:
+//		"FuncLong"
+//		"FuncLong.func1"
+//		"FuncLong.func2"
+// 		"(*PCounter).FuncLong"
+// 		"(*PCounter).FuncLong.func1"
+func FuncLong() (name string) {
+	_, _, name, _, _ = splitFuncFull(frame(2).Function)
+	return
+}
+
+// Receiver returns the receiver type of the function.
+//
+// Example:
+//		"*PCounter"
+func Receiver() (name string) {
+	_, _, _, name, _ = splitFuncFull(frame(2).Function)
+	return
+}
+
+// Function returns the name of the function.
+//
+// Example:
+//		"Function"
+func Function() (name string) {
+	_, _, _, _, name = splitFuncFull(frame(2).Function)
+	return
+}
+
+// Dir returns the directory path of the
 // source code corresponding to the program counter pc.
 func Dir() string {
 	return path.Dir(frame(2).File)
 }
 
-// File returns the file name of the
+// File returns the file path of the
 // source code corresponding to the program counter pc.
 func File() string {
 	return frame(2).File
+}
+
+// Filename returns the file name of the
+// source code corresponding to the program counter pc.
+func Filename() string {
+	return path.Base(frame(2).File)
 }
 
 // Line returns the line number of the
 // source code corresponding to the program counter pc.
 func Line() int {
 	return frame(2).Line
-}
-
-func frame(skip int) (f runtime.Frame) {
-	f, _ = runtime.CallersFrames(stack(skip+1, 1)).Next()
-	return
 }

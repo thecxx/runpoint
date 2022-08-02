@@ -23,21 +23,73 @@ type Frame struct {
 	frame runtime.Frame
 }
 
-// Func returns the name of the function.
-func (f Frame) Func() string {
+// FuncFull returns the full name of the function.
+func (f Frame) FuncFull() (name string) {
 	return f.frame.Function
 }
 
-// Dir returns the directory name of the
-// source code corresponding to the program counter pc.
-func (f Frame) Dir() string {
-	return path.Dir(f.frame.File)
+// PackFull returns the full package name of the function.
+func (f Frame) PackFull() (name string) {
+	if f.frame.PC != 0 {
+		name, _, _, _, _ = splitFuncFull(f.frame.Function)
+	}
+	return
 }
 
-// File returns the file name of the
+// Package returns the package name of the function.
+func (f Frame) Package() (name string) {
+	if f.frame.PC != 0 {
+		_, name, _, _, _ = splitFuncFull(f.frame.Function)
+	}
+	return
+}
+
+// FuncLong returns the long name of the function.
+func (f Frame) FuncLong() (name string) {
+	if f.frame.PC != 0 {
+		_, _, name, _, _ = splitFuncFull(f.frame.Function)
+	}
+	return
+}
+
+// Receiver returns the receiver type of the function.
+func (f Frame) Receiver() (name string) {
+	if f.frame.PC != 0 {
+		_, _, _, name, _ = splitFuncFull(f.frame.Function)
+	}
+	return
+}
+
+// Function returns the name of the function.
+func (f Frame) Function() (name string) {
+	if f.frame.PC != 0 {
+		_, _, _, _, name = splitFuncFull(f.frame.Function)
+	}
+	return
+}
+
+// Dir returns the directory path of the
+// source code corresponding to the program counter pc.
+func (f Frame) Dir() (dir string) {
+	if f.frame.PC != 0 {
+		dir = path.Dir(f.frame.File)
+	}
+	return
+}
+
+// File returns the file path of the
 // source code corresponding to the program counter pc.
 func (f Frame) File() string {
 	return f.frame.File
+}
+
+// Filename returns the file name of the
+// source code corresponding to the program counter pc.
+func (f Frame) Filename() (dir string) {
+	if f.frame.PC != 0 {
+		dir = path.Base(f.frame.File)
+	}
+	return
 }
 
 // Line returns the line number of the
