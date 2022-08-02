@@ -64,10 +64,7 @@ func PC(skip ...int) PCounter {
 // 		"github.com/goentf/runpoint.(PCounter).FuncFull"
 // 		"github.com/goentf/runpoint.(PCounter).FuncFull.func1"
 func (p PCounter) FuncFull() (name string) {
-	if p.fr.PC != 0 {
-		name = p.fr.Function
-	}
-	return
+	return p.fr.Function
 }
 
 // PackFull returns the full package name of the function.
@@ -75,9 +72,7 @@ func (p PCounter) FuncFull() (name string) {
 // Example:
 // 		"github.com/goentf/runpoint"
 func (p PCounter) PackFull() (name string) {
-	if p.fr.PC != 0 {
-		name, _, _, _, _ = splitFuncFull(p.fr.Function)
-	}
+	name, _, _, _, _ = splitFuncFull(p.fr.Function)
 	return
 }
 
@@ -86,9 +81,7 @@ func (p PCounter) PackFull() (name string) {
 // Example:
 // 		"runpoint"
 func (p PCounter) Package() (name string) {
-	if p.fr.PC != 0 {
-		_, name, _, _, _ = splitFuncFull(p.fr.Function)
-	}
+	_, name, _, _, _ = splitFuncFull(p.fr.Function)
 	return
 }
 
@@ -101,9 +94,7 @@ func (p PCounter) Package() (name string) {
 // 		"(PCounter).FuncLong"
 // 		"(PCounter).FuncLong.func1"
 func (p PCounter) FuncLong() (name string) {
-	if p.fr.PC != 0 {
-		_, _, name, _, _ = splitFuncFull(p.fr.Function)
-	}
+	_, _, name, _, _ = splitFuncFull(p.fr.Function)
 	return
 }
 
@@ -112,9 +103,7 @@ func (p PCounter) FuncLong() (name string) {
 // Example:
 //		"PCounter"
 func (p PCounter) Receiver() (name string) {
-	if p.fr.PC != 0 {
-		_, _, _, name, _ = splitFuncFull(p.fr.Function)
-	}
+	_, _, _, name, _ = splitFuncFull(p.fr.Function)
 	return
 }
 
@@ -123,9 +112,7 @@ func (p PCounter) Receiver() (name string) {
 // Example:
 //		"Function"
 func (p PCounter) Function() (name string) {
-	if p.fr.PC != 0 {
-		_, _, _, _, name = splitFuncFull(p.fr.Function)
-	}
+	_, _, _, _, name = splitFuncFull(p.fr.Function)
 	return
 }
 
@@ -141,17 +128,14 @@ func (p PCounter) Dir() (dir string) {
 // File returns the file path of the
 // source code corresponding to the program counter pc.
 func (p PCounter) File() (file string) {
-	if p.fr.PC != 0 {
-		file = p.fr.File
-	}
-	return
+	return p.fr.File
 }
 
 // Filename returns the file name of the
 // source code corresponding to the program counter pc.
-func (p PCounter) Filename() (dir string) {
+func (p PCounter) Filename() (name string) {
 	if p.fr.PC != 0 {
-		dir = path.Base(p.fr.File)
+		name = path.Base(p.fr.File)
 	}
 	return
 }
@@ -159,10 +143,7 @@ func (p PCounter) Filename() (dir string) {
 // Line returns the line number of the
 // source code corresponding to the program counter pc.
 func (p PCounter) Line() (line int) {
-	if p.fr.PC != 0 {
-		line = p.fr.Line
-	}
-	return
+	return p.fr.Line
 }
 
 // Frames is used to get all the stack frame.
@@ -247,24 +228,30 @@ func Function() (name string) {
 
 // Dir returns the directory path of the
 // source code corresponding to the program counter pc.
-func Dir() string {
-	return path.Dir(frame(2).File)
+func Dir() (dir string) {
+	if frame := frame(2); frame.PC != 0 {
+		dir = path.Dir(frame.File)
+	}
+	return
 }
 
 // File returns the file path of the
 // source code corresponding to the program counter pc.
-func File() string {
+func File() (file string) {
 	return frame(2).File
 }
 
 // Filename returns the file name of the
 // source code corresponding to the program counter pc.
-func Filename() string {
-	return path.Base(frame(2).File)
+func Filename() (name string) {
+	if frame := frame(2); frame.PC != 0 {
+		name = path.Base(frame.File)
+	}
+	return
 }
 
 // Line returns the line number of the
 // source code corresponding to the program counter pc.
-func Line() int {
+func Line() (line int) {
 	return frame(2).Line
 }

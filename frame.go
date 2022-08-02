@@ -38,9 +38,7 @@ func (f Frame) FuncFull() (name string) {
 // Example:
 // 		"github.com/goentf/runpoint"
 func (f Frame) PackFull() (name string) {
-	if f.frame.PC != 0 {
-		name, _, _, _, _ = splitFuncFull(f.frame.Function)
-	}
+	name, _, _, _, _ = splitFuncFull(f.frame.Function)
 	return
 }
 
@@ -49,9 +47,7 @@ func (f Frame) PackFull() (name string) {
 // Example:
 // 		"runpoint"
 func (f Frame) Package() (name string) {
-	if f.frame.PC != 0 {
-		_, name, _, _, _ = splitFuncFull(f.frame.Function)
-	}
+	_, name, _, _, _ = splitFuncFull(f.frame.Function)
 	return
 }
 
@@ -64,9 +60,7 @@ func (f Frame) Package() (name string) {
 // 		"(PCounter).FuncLong"
 // 		"(PCounter).FuncLong.func1"
 func (f Frame) FuncLong() (name string) {
-	if f.frame.PC != 0 {
-		_, _, name, _, _ = splitFuncFull(f.frame.Function)
-	}
+	_, _, name, _, _ = splitFuncFull(f.frame.Function)
 	return
 }
 
@@ -75,9 +69,7 @@ func (f Frame) FuncLong() (name string) {
 // Example:
 //		"PCounter"
 func (f Frame) Receiver() (name string) {
-	if f.frame.PC != 0 {
-		_, _, _, name, _ = splitFuncFull(f.frame.Function)
-	}
+	_, _, _, name, _ = splitFuncFull(f.frame.Function)
 	return
 }
 
@@ -86,9 +78,7 @@ func (f Frame) Receiver() (name string) {
 // Example:
 //		"Function"
 func (f Frame) Function() (name string) {
-	if f.frame.PC != 0 {
-		_, _, _, _, name = splitFuncFull(f.frame.Function)
-	}
+	_, _, _, _, name = splitFuncFull(f.frame.Function)
 	return
 }
 
@@ -103,21 +93,21 @@ func (f Frame) Dir() (dir string) {
 
 // File returns the file path of the
 // source code corresponding to the program counter pc.
-func (f Frame) File() string {
+func (f Frame) File() (file string) {
 	return f.frame.File
 }
 
 // Filename returns the file name of the
 // source code corresponding to the program counter pc.
-func (f Frame) Filename() (dir string) {
+func (f Frame) Filename() (name string) {
 	if f.frame.PC != 0 {
-		dir = path.Base(f.frame.File)
+		name = path.Base(f.frame.File)
 	}
 	return
 }
 
 // Line returns the line number of the
 // source code corresponding to the program counter pc.
-func (f Frame) Line() int {
+func (f Frame) Line() (line int) {
 	return f.frame.Line
 }
