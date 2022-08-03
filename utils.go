@@ -19,6 +19,7 @@ import (
 	"strings"
 )
 
+// splitFuncFull splits all component of a function's name reported by runtime.Frame.Function.
 func splitFuncFull(name string) (pf, p, fl, r, fn string) {
 	if name == "" {
 		return

@@ -20,6 +20,10 @@
 
 # Getting started
 
+## Use case 1
+
+Simplified functions.
+
 ```
 package main
 
@@ -33,28 +37,47 @@ func main() {
 	fmt.Printf("Current package: %s\n", runpoint.Package())
 	fmt.Printf("Current file: %s\n", runpoint.File())
 	fmt.Printf("Current line: %d\n", runpoint.Line())
+}
+```
 
+## Use case 2
+
+Generate `runpoint.PCounter` object at run point via `runpoint.PC()`.
+
+```
+package main
+
+import (
+    "fmt"
+
+    "github.com/goentf/runpoint"
+)
+
+func main() {
 	pc := runpoint.PC()
-	fmt.Printf("Current package: %s\n", pc.Package())
-	fmt.Printf("Current file: %s\n", pc.File())
-	fmt.Printf("Current line: %d\n", pc.Line())
+	fmt.Printf("Package: %s\n", pc.Package())
+	fmt.Printf("File: %s\n", pc.File())
+	fmt.Printf("Line: %d\n", pc.Line())
 
 	pc.Frames(func(f runpoint.Frame) {
-		fmt.Printf("Current package: %s\n", f.Package())
-		fmt.Printf("Current file: %s\n", f.File())
-		fmt.Printf("Current line: %d\n", f.Line())
+		fmt.Printf("Package: %s\n", f.Package())
+		fmt.Printf("File: %s\n", f.File())
+		fmt.Printf("Line: %d\n", f.Line())
 	})
-
-	// Others:
-	// runpoint.PackFull() // example: github.com/goentf/runpoint
-	// runpoint.Package()  // example: runpoint
-	// runpoint.FuncFull() // example: github.com/goentf/runpoint.FuncFull
-	// runpoint.Receiver() // example: PCounter
-	// runpoint.FuncLong() // example: (PCounter).FuncFull
-	// runpoint.Function() // example: FuncFull
-	// runpoint.Dir()
-	// runpoint.File()
-	// runpoint.Filename()
-	// runpoint.Line()
 }
+```
+
+## Examples
+
+```
+// PackFull() // example: github.com/goentf/runpoint
+// Package()  // example: runpoint
+// FuncFull() // example: github.com/goentf/runpoint.(PCounter).FuncFull
+// Receiver() // example: PCounter
+// FuncLong() // example: (PCounter).FuncFull
+// Function() // example: FuncFull
+// Dir()
+// File()
+// Filename()
+// Line()
 ```
