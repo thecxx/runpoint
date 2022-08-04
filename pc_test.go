@@ -12,38 +12,36 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package runpoint_test
+package runpoint
 
 import (
 	"strings"
 	"testing"
-
-	"github.com/goentf/runpoint"
 )
 
 func TestFunction(t *testing.T) {
-	if !strings.HasSuffix(runpoint.PC().Function(), "TestFunction") {
+	if !strings.HasSuffix(PC().Function(), "TestFunction") {
 		t.Errorf("Func fail")
 	}
 }
 
 func TestDir(t *testing.T) {
-	if !strings.HasSuffix(runpoint.PC().Dir(), "runpoint") {
+	if !strings.HasSuffix(PC().Dir(), "runpoint") {
 		t.Errorf("Dir fail")
 	}
 }
 
 func TestFile(t *testing.T) {
-	if !strings.HasSuffix(runpoint.PC().File(), "pc_test.go") {
+	if !strings.HasSuffix(PC().File(), "pc_test.go") {
 		t.Errorf("File fail")
 	}
 }
 
 func TestAll(t *testing.T) {
-	if runpoint.Package() != "runpoint_test" {
+	if Package() != "runpoint" {
 		t.Errorf("Package fail")
 	}
-	if runpoint.Function() != "TestAll" {
+	if Function() != "TestAll" {
 		t.Errorf("Function fail")
 	}
 }

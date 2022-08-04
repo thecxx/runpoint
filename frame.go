@@ -27,8 +27,8 @@ type Frame struct {
 //
 // Example:
 // 		"github.com/goentf/runpoint.FuncFull"
-// 		"github.com/goentf/runpoint.(PCounter).FuncFull"
-// 		"github.com/goentf/runpoint.(PCounter).FuncFull.func1"
+// 		"github.com/goentf/runpoint.(*PCounter).FuncFull"
+// 		"github.com/goentf/runpoint.(*PCounter).FuncFull.func1"
 func (f Frame) FuncFull() (name string) {
 	return f.frame.Function
 }
@@ -57,8 +57,8 @@ func (f Frame) Package() (name string) {
 //		"FuncLong"
 //		"FuncLong.func1"
 //		"FuncLong.func2"
-// 		"(PCounter).FuncLong"
-// 		"(PCounter).FuncLong.func1"
+// 		"(*PCounter).FuncLong"
+// 		"(*PCounter).FuncLong.func1"
 func (f Frame) FuncLong() (name string) {
 	_, _, name, _, _ = splitFuncFull(f.frame.Function)
 	return
@@ -67,7 +67,7 @@ func (f Frame) FuncLong() (name string) {
 // Receiver returns the receiver type of the function.
 //
 // Example:
-//		"PCounter"
+//		"*PCounter"
 func (f Frame) Receiver() (name string) {
 	_, _, _, name, _ = splitFuncFull(f.frame.Function)
 	return

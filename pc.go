@@ -18,6 +18,7 @@ import (
 	"errors"
 	"path"
 	"runtime"
+	"sync"
 	"sync/atomic"
 )
 
@@ -37,12 +38,15 @@ type (
 	// Program counter
 	PCounter struct {
 		st []uintptr
+		lz sync.Once
 		fr runtime.Frame
+		// Cache the result of function splitFuncFull
+		pf, pn, fl, rn, fn string
 	}
 )
 
 // PC returns a PCounter.
-func PC(skip ...int) PCounter {
+func PC(skip ...int) *PCounter {
 	s := 0
 	if len(skip) == 1 {
 		if skip[0] < 0 {
@@ -50,20 +54,19 @@ func PC(skip ...int) PCounter {
 		}
 		s = skip[0]
 	}
-	p := PCounter{st: stack(s+2, int(depth))}
-	if len(p.st) > 0 {
-		p.fr, _ = runtime.CallersFrames(p.st[0:1]).Next()
-	}
-	return p
+	return &PCounter{st: stack(s+2, int(depth))}
 }
 
 // FuncFull returns the full name of the function.
 //
 // Example:
 // 		"github.com/goentf/runpoint.FuncFull"
-// 		"github.com/goentf/runpoint.(PCounter).FuncFull"
-// 		"github.com/goentf/runpoint.(PCounter).FuncFull.func1"
-func (p PCounter) FuncFull() (name string) {
+// 		"github.com/goentf/runpoint.(*PCounter).FuncFull"
+// 		"github.com/goentf/runpoint.(*PCounter).FuncFull.func1"
+func (p *PCounter) FuncFull() (name string) {
+	if p.fr.PC == 0 {
+		p.lazyLoad()
+	}
 	return p.fr.Function
 }
 
@@ -71,18 +74,22 @@ func (p PCounter) FuncFull() (name string) {
 //
 // Example:
 // 		"github.com/goentf/runpoint"
-func (p PCounter) PackFull() (name string) {
-	name, _, _, _, _ = splitFuncFull(p.fr.Function)
-	return
+func (p *PCounter) PackFull() (name string) {
+	if p.fr.PC == 0 {
+		p.lazyLoad()
+	}
+	return p.pf
 }
 
 // Package returns the package name of the function.
 //
 // Example:
 // 		"runpoint"
-func (p PCounter) Package() (name string) {
-	_, name, _, _, _ = splitFuncFull(p.fr.Function)
-	return
+func (p *PCounter) Package() (name string) {
+	if p.fr.PC == 0 {
+		p.lazyLoad()
+	}
+	return p.pn
 }
 
 // FuncLong returns the long name of the function.
@@ -91,34 +98,43 @@ func (p PCounter) Package() (name string) {
 //		"FuncLong"
 //		"FuncLong.func1"
 //		"FuncLong.func2"
-// 		"(PCounter).FuncLong"
-// 		"(PCounter).FuncLong.func1"
-func (p PCounter) FuncLong() (name string) {
-	_, _, name, _, _ = splitFuncFull(p.fr.Function)
-	return
+// 		"(*PCounter).FuncLong"
+// 		"(*PCounter).FuncLong.func1"
+func (p *PCounter) FuncLong() (name string) {
+	if p.fr.PC == 0 {
+		p.lazyLoad()
+	}
+	return p.fl
 }
 
 // Receiver returns the receiver type of the function.
 //
 // Example:
-//		"PCounter"
-func (p PCounter) Receiver() (name string) {
-	_, _, _, name, _ = splitFuncFull(p.fr.Function)
-	return
+//		"*PCounter"
+func (p *PCounter) Receiver() (name string) {
+	if p.fr.PC == 0 {
+		p.lazyLoad()
+	}
+	return p.rn
 }
 
 // Function returns the name of the function.
 //
 // Example:
 //		"Function"
-func (p PCounter) Function() (name string) {
-	_, _, _, _, name = splitFuncFull(p.fr.Function)
-	return
+func (p *PCounter) Function() (name string) {
+	if p.fr.PC == 0 {
+		p.lazyLoad()
+	}
+	return p.fn
 }
 
 // Dir returns the directory path of the
 // source code corresponding to the program counter pc.
-func (p PCounter) Dir() (dir string) {
+func (p *PCounter) Dir() (dir string) {
+	if p.fr.PC == 0 {
+		p.lazyLoad()
+	}
 	if p.fr.PC != 0 {
 		dir = path.Dir(p.fr.File)
 	}
@@ -127,13 +143,19 @@ func (p PCounter) Dir() (dir string) {
 
 // File returns the file path of the
 // source code corresponding to the program counter pc.
-func (p PCounter) File() (file string) {
+func (p *PCounter) File() (file string) {
+	if p.fr.PC == 0 {
+		p.lazyLoad()
+	}
 	return p.fr.File
 }
 
 // Filename returns the file name of the
 // source code corresponding to the program counter pc.
-func (p PCounter) Filename() (name string) {
+func (p *PCounter) Filename() (name string) {
+	if p.fr.PC == 0 {
+		p.lazyLoad()
+	}
 	if p.fr.PC != 0 {
 		name = path.Base(p.fr.File)
 	}
@@ -142,12 +164,15 @@ func (p PCounter) Filename() (name string) {
 
 // Line returns the line number of the
 // source code corresponding to the program counter pc.
-func (p PCounter) Line() (line int) {
+func (p *PCounter) Line() (line int) {
+	if p.fr.PC == 0 {
+		p.lazyLoad()
+	}
 	return p.fr.Line
 }
 
-// Frames is used to get all the stack frame.
-func (p PCounter) Frames(fun func(Frame)) (num int) {
+// Frames is used to get all the stack frames.
+func (p *PCounter) Frames(fun func(Frame)) (num int) {
 	if fun == nil {
 		return
 	}
@@ -167,12 +192,24 @@ func (p PCounter) Frames(fun func(Frame)) (num int) {
 	}
 }
 
+func (p *PCounter) lazyLoad() {
+	p.lz.Do(func() {
+		if len(p.st) < 1 {
+			return
+		}
+		p.fr, _ = runtime.CallersFrames(p.st[0:1]).Next()
+		if p.fr.PC != 0 {
+			p.pf, p.pn, p.fl, p.rn, p.fn = splitFuncFull(p.fr.Function)
+		}
+	})
+}
+
 // FuncFull returns the full name of the function.
 //
 // Example:
 // 		"github.com/goentf/runpoint.FuncFull"
-// 		"github.com/goentf/runpoint.(PCounter).FuncFull"
-// 		"github.com/goentf/runpoint.(PCounter).FuncFull.func1"
+// 		"github.com/goentf/runpoint.(*PCounter).FuncFull"
+// 		"github.com/goentf/runpoint.(*PCounter).FuncFull.func1"
 func FuncFull() (name string) {
 	return frame(2).Function
 }
@@ -201,8 +238,8 @@ func Package() (name string) {
 //		"FuncLong"
 //		"FuncLong.func1"
 //		"FuncLong.func2"
-// 		"(PCounter).FuncLong"
-// 		"(PCounter).FuncLong.func1"
+// 		"(*PCounter).FuncLong"
+// 		"(*PCounter).FuncLong.func1"
 func FuncLong() (name string) {
 	_, _, name, _, _ = splitFuncFull(frame(2).Function)
 	return
@@ -211,7 +248,7 @@ func FuncLong() (name string) {
 // Receiver returns the receiver type of the function.
 //
 // Example:
-//		"PCounter"
+//		"*PCounter"
 func Receiver() (name string) {
 	_, _, _, name, _ = splitFuncFull(frame(2).Function)
 	return

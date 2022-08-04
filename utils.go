@@ -20,7 +20,7 @@ import (
 )
 
 // splitFuncFull splits all component of a function's name reported by runtime.Frame.Function.
-func splitFuncFull(name string) (pf, p, fl, r, fn string) {
+func splitFuncFull(name string) (pf, pn, fl, rn, fn string) {
 	if name == "" {
 		return
 	}
@@ -38,7 +38,7 @@ func splitFuncFull(name string) (pf, p, fl, r, fn string) {
 	}
 	pf, fl = name[0:i], name[i+1:]
 	if pf != "" {
-		p = path.Base(pf)
+		pn = path.Base(pf)
 	}
 
 	i = 0
@@ -47,25 +47,29 @@ func splitFuncFull(name string) (pf, p, fl, r, fn string) {
 		// (Receiver)
 		if c == '(' {
 			i++
+			j := i
 			for {
-				r += string(fl[i])
-				if fl[i+1] == ')' {
-					i += 2
+				if fl[j+1] == ')' {
+					rn = fl[i : j+1]
+					i = j + 1
 					break
 				}
-				i++
+				j++
 			}
+			continue
 		}
-		if c == '.' {
+		if c == ')' || c == '.' {
 			i++
+			continue
 		}
 		// Fuction
+		j := i
 		for {
-			fn += string(fl[i])
-			if i+1 >= len(fl) || fl[i+1] == '.' {
+			if j+1 >= len(fl) || fl[j+1] == '.' {
+				fn = fl[i : j+1]
 				return
 			}
-			i++
+			j++
 		}
 	}
 	return
