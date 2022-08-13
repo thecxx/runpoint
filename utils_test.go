@@ -19,13 +19,13 @@ import (
 )
 
 const (
-	f1 = "github.com/goentf/runpoint.FuncFull.func1"
-	f2 = "github.com/goentf/runpoint.(*PCounter).FuncFull.func1"
+	f1 = "github.com/thecxx/runpoint.FuncFull.func1"
+	f2 = "github.com/thecxx/runpoint.(*PCounter).FuncFull.func1"
 )
 
 func TestSplitFuncFull(t *testing.T) {
 	pf, pn, fl, rn, fn := splitFuncFull(f1)
-	if pf != "github.com/goentf/runpoint" {
+	if pf != "github.com/thecxx/runpoint" {
 		t.Errorf("invalid full package name: %s\n", pf)
 	}
 	if pn != "runpoint" {
@@ -44,7 +44,7 @@ func TestSplitFuncFull(t *testing.T) {
 
 func TestSplitFuncFullWithReceiver(t *testing.T) {
 	pf, pn, fl, rn, fn := splitFuncFull(f2)
-	if pf != "github.com/goentf/runpoint" {
+	if pf != "github.com/thecxx/runpoint" {
 		t.Errorf("invalid full package name: %s\n", pf)
 	}
 	if pn != "runpoint" {

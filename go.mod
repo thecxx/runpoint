@@ -1,3 +1,3 @@
-module github.com/goentf/runpoint
+module github.com/thecxx/runpoint
 
 go 1.15

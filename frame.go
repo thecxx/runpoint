@@ -26,9 +26,10 @@ type Frame struct {
 // FuncFull returns the full name of the function.
 //
 // Example:
-// 		"github.com/goentf/runpoint.FuncFull"
-// 		"github.com/goentf/runpoint.(*PCounter).FuncFull"
-// 		"github.com/goentf/runpoint.(*PCounter).FuncFull.func1"
+//
+//	"github.com/thecxx/runpoint.FuncFull"
+//	"github.com/thecxx/runpoint.(*PCounter).FuncFull"
+//	"github.com/thecxx/runpoint.(*PCounter).FuncFull.func1"
 func (f Frame) FuncFull() (name string) {
 	return f.frame.Function
 }
@@ -36,7 +37,8 @@ func (f Frame) FuncFull() (name string) {
 // PackFull returns the full package name of the function.
 //
 // Example:
-// 		"github.com/goentf/runpoint"
+//
+//	"github.com/thecxx/runpoint"
 func (f Frame) PackFull() (name string) {
 	name, _, _, _, _ = splitFuncFull(f.frame.Function)
 	return
@@ -45,7 +47,8 @@ func (f Frame) PackFull() (name string) {
 // Package returns the package name of the function.
 //
 // Example:
-// 		"runpoint"
+//
+//	"runpoint"
 func (f Frame) Package() (name string) {
 	_, name, _, _, _ = splitFuncFull(f.frame.Function)
 	return
@@ -54,11 +57,12 @@ func (f Frame) Package() (name string) {
 // FuncLong returns the long name of the function.
 //
 // Example:
-//		"FuncLong"
-//		"FuncLong.func1"
-//		"FuncLong.func2"
-// 		"(*PCounter).FuncLong"
-// 		"(*PCounter).FuncLong.func1"
+//
+//	"FuncLong"
+//	"FuncLong.func1"
+//	"FuncLong.func2"
+//	"(*PCounter).FuncLong"
+//	"(*PCounter).FuncLong.func1"
 func (f Frame) FuncLong() (name string) {
 	_, _, name, _, _ = splitFuncFull(f.frame.Function)
 	return
@@ -67,7 +71,8 @@ func (f Frame) FuncLong() (name string) {
 // Receiver returns the receiver type of the function.
 //
 // Example:
-//		"*PCounter"
+//
+//	"*PCounter"
 func (f Frame) Receiver() (name string) {
 	_, _, _, name, _ = splitFuncFull(f.frame.Function)
 	return
@@ -76,7 +81,8 @@ func (f Frame) Receiver() (name string) {
 // Function returns the name of the function.
 //
 // Example:
-//		"Function"
+//
+//	"Function"
 func (f Frame) Function() (name string) {
 	_, _, _, _, name = splitFuncFull(f.frame.Function)
 	return

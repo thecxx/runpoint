@@ -60,9 +60,10 @@ func PC(skip ...int) *PCounter {
 // FuncFull returns the full name of the function.
 //
 // Example:
-// 		"github.com/goentf/runpoint.FuncFull"
-// 		"github.com/goentf/runpoint.(*PCounter).FuncFull"
-// 		"github.com/goentf/runpoint.(*PCounter).FuncFull.func1"
+//
+//	"github.com/thecxx/runpoint.FuncFull"
+//	"github.com/thecxx/runpoint.(*PCounter).FuncFull"
+//	"github.com/thecxx/runpoint.(*PCounter).FuncFull.func1"
 func (p *PCounter) FuncFull() (name string) {
 	if p.fr.PC == 0 {
 		p.lazyLoad()
@@ -73,7 +74,8 @@ func (p *PCounter) FuncFull() (name string) {
 // PackFull returns the full package name of the function.
 //
 // Example:
-// 		"github.com/goentf/runpoint"
+//
+//	"github.com/thecxx/runpoint"
 func (p *PCounter) PackFull() (name string) {
 	if p.fr.PC == 0 {
 		p.lazyLoad()
@@ -84,7 +86,8 @@ func (p *PCounter) PackFull() (name string) {
 // Package returns the package name of the function.
 //
 // Example:
-// 		"runpoint"
+//
+//	"runpoint"
 func (p *PCounter) Package() (name string) {
 	if p.fr.PC == 0 {
 		p.lazyLoad()
@@ -95,11 +98,12 @@ func (p *PCounter) Package() (name string) {
 // FuncLong returns the long name of the function.
 //
 // Example:
-//		"FuncLong"
-//		"FuncLong.func1"
-//		"FuncLong.func2"
-// 		"(*PCounter).FuncLong"
-// 		"(*PCounter).FuncLong.func1"
+//
+//	"FuncLong"
+//	"FuncLong.func1"
+//	"FuncLong.func2"
+//	"(*PCounter).FuncLong"
+//	"(*PCounter).FuncLong.func1"
 func (p *PCounter) FuncLong() (name string) {
 	if p.fr.PC == 0 {
 		p.lazyLoad()
@@ -110,7 +114,8 @@ func (p *PCounter) FuncLong() (name string) {
 // Receiver returns the receiver type of the function.
 //
 // Example:
-//		"*PCounter"
+//
+//	"*PCounter"
 func (p *PCounter) Receiver() (name string) {
 	if p.fr.PC == 0 {
 		p.lazyLoad()
@@ -121,7 +126,8 @@ func (p *PCounter) Receiver() (name string) {
 // Function returns the name of the function.
 //
 // Example:
-//		"Function"
+//
+//	"Function"
 func (p *PCounter) Function() (name string) {
 	if p.fr.PC == 0 {
 		p.lazyLoad()
@@ -207,9 +213,10 @@ func (p *PCounter) lazyLoad() {
 // FuncFull returns the full name of the function.
 //
 // Example:
-// 		"github.com/goentf/runpoint.FuncFull"
-// 		"github.com/goentf/runpoint.(*PCounter).FuncFull"
-// 		"github.com/goentf/runpoint.(*PCounter).FuncFull.func1"
+//
+//	"github.com/thecxx/runpoint.FuncFull"
+//	"github.com/thecxx/runpoint.(*PCounter).FuncFull"
+//	"github.com/thecxx/runpoint.(*PCounter).FuncFull.func1"
 func FuncFull() (name string) {
 	return frame(2).Function
 }
@@ -217,7 +224,8 @@ func FuncFull() (name string) {
 // PackFull returns the full package name of the function.
 //
 // Example:
-// 		"github.com/goentf/runpoint"
+//
+//	"github.com/thecxx/runpoint"
 func PackFull() (name string) {
 	name, _, _, _, _ = splitFuncFull(frame(2).Function)
 	return
@@ -226,7 +234,8 @@ func PackFull() (name string) {
 // Package returns the package name of the function.
 //
 // Example:
-// 		"runpoint"
+//
+//	"runpoint"
 func Package() (name string) {
 	_, name, _, _, _ = splitFuncFull(frame(2).Function)
 	return
@@ -235,11 +244,12 @@ func Package() (name string) {
 // FuncLong returns the long name of the function.
 //
 // Example:
-//		"FuncLong"
-//		"FuncLong.func1"
-//		"FuncLong.func2"
-// 		"(*PCounter).FuncLong"
-// 		"(*PCounter).FuncLong.func1"
+//
+//	"FuncLong"
+//	"FuncLong.func1"
+//	"FuncLong.func2"
+//	"(*PCounter).FuncLong"
+//	"(*PCounter).FuncLong.func1"
 func FuncLong() (name string) {
 	_, _, name, _, _ = splitFuncFull(frame(2).Function)
 	return
@@ -248,7 +258,8 @@ func FuncLong() (name string) {
 // Receiver returns the receiver type of the function.
 //
 // Example:
-//		"*PCounter"
+//
+//	"*PCounter"
 func Receiver() (name string) {
 	_, _, _, name, _ = splitFuncFull(frame(2).Function)
 	return
@@ -257,7 +268,8 @@ func Receiver() (name string) {
 // Function returns the name of the function.
 //
 // Example:
-//		"Function"
+//
+//	"Function"
 func Function() (name string) {
 	_, _, _, _, name = splitFuncFull(frame(2).Function)
 	return

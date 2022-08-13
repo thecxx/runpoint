@@ -30,7 +30,7 @@ package main
 import (
     "fmt"
 
-    "github.com/goentf/runpoint"
+    "github.com/thecxx/runpoint"
 )
 
 func main() {
@@ -50,7 +50,7 @@ package main
 import (
     "fmt"
 
-    "github.com/goentf/runpoint"
+    "github.com/thecxx/runpoint"
 )
 
 func main() {
@@ -70,9 +70,9 @@ func main() {
 ## Examples
 
 ```
-// PackFull() // example: github.com/goentf/runpoint
+// PackFull() // example: github.com/thecxx/runpoint
 // Package()  // example: runpoint
-// FuncFull() // example: github.com/goentf/runpoint.(PCounter).FuncFull
+// FuncFull() // example: github.com/thecxx/runpoint.(PCounter).FuncFull
 // Receiver() // example: PCounter
 // FuncLong() // example: (PCounter).FuncFull
 // Function() // example: FuncFull
